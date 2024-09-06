@@ -3,13 +3,13 @@ import userData from "../utils/jsonFiles/userData.json";
 import avatar from "../utils/images/ava.jpg";
 import "../Styles/UserManage.css";
 
-const fs = require("fs");
-
 function UserManage() {
     const [allProfileData, setAllProfileData] = useState([]);
     const [profileData, setProfileData] = useState([]);
     const [newProfileData, setNewProfileData] = useState([]);
     const [currentProfile, setCurrentProfile] = useState({});
+    const [updateData, setUpdateData] = useState(0);
+    const [smallUpdateData, setSmallUpdateData] = useState(0);
 
     const toTitleCase = (phrase) => {
         return phrase
@@ -19,30 +19,9 @@ function UserManage() {
             .join(" ");
     };
 
-    const loadData = () => {
-        var allUserList = [];
-        var userList = [];
-        var newUserList = [];
-
-        var keys = Object.keys(userData);
-        keys.forEach(function (key) {
-            if (userData[key].status === "true") {
-                userList.push(userData[key]);
-            } else {
-                newUserList.push(userData[key]);
-            }
-            allUserList.push(userData[key]);
-        });
-
-        setProfileData(userList);
-        setNewProfileData(newUserList);
-        setAllProfileData(allUserList);
-    };
-
     const showUserProfile = (profileIndex, status) => {
         const layerBlur = document.querySelectorAll(".layer-blur");
         const userProfile = document.querySelectorAll(".user-profile");
-        const newUserProfile = document.querySelectorAll(".new-user-profile");
 
         layerBlur.forEach((layer) => {
             layer.classList.remove("layer-hidden");
@@ -52,11 +31,6 @@ function UserManage() {
         userProfile.forEach((layer) => {
             layer.classList.remove("layer-hidden");
             layer.classList.add("layer-show");
-        });
-
-        newUserProfile.forEach((layer) => {
-            layer.classList.remove("layer-show");
-            layer.classList.add("layer-hidden");
         });
 
         var count = -1;
@@ -72,17 +46,11 @@ function UserManage() {
 
     const showNewUserProfile = (profileIndex) => {
         const layerBlur = document.querySelectorAll(".layer-blur");
-        const userProfile = document.querySelectorAll(".user-profile");
         const newUserProfile = document.querySelectorAll(".new-user-profile");
 
         layerBlur.forEach((layer) => {
             layer.classList.remove("layer-hidden");
             layer.classList.add("layer-show");
-        });
-
-        userProfile.forEach((layer) => {
-            layer.classList.remove("layer-show");
-            layer.classList.add("layer-hidden");
         });
 
         newUserProfile.forEach((layer) => {
@@ -103,6 +71,7 @@ function UserManage() {
         const newUserProfile = document.querySelectorAll(".new-user-profile");
         const removeProfile = document.querySelectorAll(".remove-profile");
         const removeNewProfile = document.querySelectorAll(".remove-new-profile");
+        const editProfile = document.querySelectorAll(".edit-profile");
 
         layerBlur.forEach((layer) => {
             layer.classList.remove("layer-show");
@@ -128,12 +97,36 @@ function UserManage() {
             layer.classList.remove("layer-show");
             layer.classList.add("layer-hidden");
         });
+
+        editProfile.forEach((layer) => {
+            layer.classList.remove("layer-show");
+            layer.classList.add("layer-hidden");
+        });
+
+        var allInputList = [
+            ".username-input",
+            ".name-input",
+            ".email-input",
+            ".phone-input",
+            ".facebook-input",
+            ".birth-input",
+            ".small-username-input",
+            ".small-name-input",
+            ".small-email-input",
+            ".small-phone-input",
+            ".small-facebook-input",
+            ".small-birth-input",
+        ];
+
+        allInputList.forEach((input) => {
+            var inputValue = document.querySelector(input);
+            inputValue.value = "";
+        });
     };
 
     const removeUserProfile = (profileIndex, status) => {
         const layerBlur = document.querySelectorAll(".layer-blur");
         const removeProfile = document.querySelectorAll(".remove-profile");
-        const removeNewProfile = document.querySelectorAll(".remove-new-profile");
 
         layerBlur.forEach((layer) => {
             layer.classList.remove("layer-hidden");
@@ -143,11 +136,6 @@ function UserManage() {
         removeProfile.forEach((layer) => {
             layer.classList.remove("layer-hidden");
             layer.classList.add("layer-show");
-        });
-
-        removeNewProfile.forEach((layer) => {
-            layer.classList.remove("layer-show");
-            layer.classList.add("layer-hidden");
         });
 
         var count = -1;
@@ -163,17 +151,11 @@ function UserManage() {
 
     const removeNewUserProfile = (profileIndex, status) => {
         const layerBlur = document.querySelectorAll(".layer-blur");
-        const removeProfile = document.querySelectorAll(".remove-profile");
         const removeNewProfile = document.querySelectorAll(".remove-new-profile");
 
         layerBlur.forEach((layer) => {
             layer.classList.remove("layer-hidden");
             layer.classList.add("layer-show");
-        });
-
-        removeProfile.forEach((layer) => {
-            layer.classList.remove("layer-show");
-            layer.classList.add("layer-hidden");
         });
 
         removeNewProfile.forEach((layer) => {
@@ -201,13 +183,208 @@ function UserManage() {
             }
         });
 
-        const data = JSON.stringify(allUserList);
+        setAllProfileData(allUserList);
+        hideUserProfile();
+    };
+
+    const editUserProfile = (profileIndex) => {
+        const layerBlur = document.querySelectorAll(".layer-blur");
+        const editProfile = document.querySelectorAll(".edit-profile");
+
+        layerBlur.forEach((layer) => {
+            layer.classList.remove("layer-hidden");
+            layer.classList.add("layer-show");
+        });
+
+        editProfile.forEach((layer) => {
+            layer.classList.remove("layer-hidden");
+            layer.classList.add("layer-show");
+        });
+
+        profileData.forEach((item, index) => {
+            if (index === profileIndex) {
+                setCurrentProfile(item);
+            }
+        });
+
+        const titleList = [
+            ".name-title",
+            ".email-title",
+            ".phone-title",
+            ".gender-title",
+            ".facebook-title",
+            ".birth-title",
+            ".small-name-title",
+            ".small-email-title",
+            ".small-phone-title",
+            ".small-gender-title",
+            ".small-facebook-title",
+            ".small-birth-title",
+        ];
+
+        titleList.forEach((title) => {
+            var titleName = document.querySelector(title);
+            titleName.style.color = "black";
+        });
+    };
+
+    const inputFill = (titleName, titleInput) => {
+        if (titleName !== "") {
+            var titleValue = document.querySelector(titleName);
+            var inputValue = document.querySelector(titleInput);
+
+            if (inputValue.value !== "") {
+                if (inputValue.placeholder !== inputValue.value) {
+                    titleValue.style.color = "rgb(242, 82, 82)";
+                } else {
+                    titleValue.style.color = "black";
+                }
+            } else {
+                titleValue.style.color = "black";
+            }
+        }
+    };
+
+    const confirmSave = (buttonSize) => {
+        var valueList = [];
+
+        if (buttonSize === "large") {
+            const inputList = [
+                ".username-input",
+                ".name-input",
+                ".email-input",
+                ".phone-input",
+                ".gender-input",
+                ".facebook-input",
+                ".birth-input",
+            ];
+
+            inputList.forEach((input) => {
+                var inputValue = document.querySelector(input);
+                if (inputValue.value !== "") {
+                    valueList.push(inputValue.value);
+                } else {
+                    valueList.push(inputValue.placeholder);
+                }
+            });
+        } else {
+            const inputList = [
+                ".small-username-input",
+                ".small-name-input",
+                ".small-email-input",
+                ".small-phone-input",
+                ".small-gender-input",
+                ".small-facebook-input",
+                ".small-birth-input",
+            ];
+
+            inputList.forEach((input) => {
+                var inputValue = document.querySelector(input);
+                if (inputValue.value !== "") {
+                    valueList.push(inputValue.value);
+                } else {
+                    valueList.push(inputValue.placeholder);
+                }
+            });
+        }
+
+        console.log(valueList);
+        hideUserProfile();
     };
 
     useEffect(() => {
-        loadData();
+        var allUserList = [];
+        var userList = [];
+        var newUserList = [];
+
+        var keys = Object.keys(userData);
+        keys.forEach(function (key) {
+            if (userData[key].status === "true") {
+                userList.push(userData[key]);
+            } else {
+                newUserList.push(userData[key]);
+            }
+            allUserList.push(userData[key]);
+        });
+
+        setProfileData(userList);
+        setNewProfileData(newUserList);
+        setAllProfileData(allUserList);
+
+        const inputList = [
+            ".username-input",
+            ".name-input",
+            ".email-input",
+            ".phone-input",
+            ".gender-input",
+            ".facebook-input",
+            ".birth-input",
+        ];
+
+        var count = 0;
+
+        inputList.forEach((input) => {
+            var inputValue = document.querySelector(input);
+            if (inputValue.value !== "") {
+                if (inputValue.placeholder !== inputValue.value) {
+                    count += 1;
+                }
+            }
+        });
+
+        var genderTitle = document.querySelector(".gender-title");
+        if (genderTitle.style.color === "rgb(242, 82, 82)") {
+            count += 1;
+        }
+
+        setUpdateData(count);
+
+        var saveButton = document.querySelector(".save-button");
+
+        if (updateData > 0) {
+            saveButton.classList.remove("btn-disabled");
+        } else {
+            saveButton.classList.add("btn-disabled");
+        }
+
+        const smallInputList = [
+            ".small-username-input",
+            ".small-name-input",
+            ".small-email-input",
+            ".small-phone-input",
+            ".small-gender-input",
+            ".small-facebook-input",
+            ".small-birth-input",
+        ];
+
+        var smallCount = 0;
+
+        smallInputList.forEach((input) => {
+            var inputValue = document.querySelector(input);
+            if (inputValue.value !== "") {
+                if (inputValue.placeholder !== inputValue.value) {
+                    smallCount += 1;
+                }
+            }
+        });
+
+        var smallGenderTitle = document.querySelector(".small-gender-title");
+        if (smallGenderTitle.style.color === "rgb(242, 82, 82)") {
+            smallCount += 1;
+        }
+
+        setSmallUpdateData(smallCount);
+
+        var smallSaveButton = document.querySelector(".small-save-button");
+
+        if (smallUpdateData > 0) {
+            smallSaveButton.classList.remove("btn-disabled");
+        } else {
+            smallSaveButton.classList.add("btn-disabled");
+        }
+
         return () => {};
-    }, [profileData, newProfileData, allProfileData]);
+    }, [profileData, newProfileData, allProfileData, updateData, smallUpdateData, currentProfile]);
 
     return (
         <div class="bg-white font-Kanit" data-theme="retro">
@@ -256,7 +433,13 @@ function UserManage() {
                                                 <td>{obj.email}</td>
                                                 <td>{toTitleCase(obj.role)}</td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-sm btn-square btn-info brightness-200 m-1">
+                                                    <button
+                                                        class="btn btn-sm btn-square btn-info brightness-200 m-1"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            editUserProfile(index);
+                                                        }}
+                                                    >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             class="h-5 w-5"
@@ -418,7 +601,7 @@ function UserManage() {
                             <div>{currentProfile.email}</div>
                         </div>
                         <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
-                            <div>Số điện thoại:&nbsp;</div>
+                            <div>Điện thoại:&nbsp;</div>
                             <div>{currentProfile.phoneNumber}</div>
                         </div>
                         <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
@@ -426,7 +609,7 @@ function UserManage() {
                             <div>{currentProfile.gender === "male" ? "Nam" : "Nữ"}</div>
                         </div>
                         <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
-                            <div>Tài khoản Facebook:&nbsp;</div>
+                            <div>Facebook:&nbsp;</div>
                             <div>{currentProfile.accountFacebook}</div>
                         </div>
                         <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
@@ -477,6 +660,121 @@ function UserManage() {
                         </div>
                     </div>
                 </div>
+                <div class="card lg:card-side bg-base-200 shadow-2xl sm:w-[65%] xl:w-[55%] 2xl:w-[55%] absolute top-[20%] sm:left-[22%] xl:left-[24%] 2xl:left-[24%] z-20 edit-profile layer-hidden">
+                    <button
+                        className="save-button btn btn-circle btn-success btn-disabled brightness-125 absolute sm:top-[83%] sm:left-[91%] xl:top-[84%%] xl:left-[92%] 2xl:top-[85%] 2xl:left-[93%]"
+                        onClick={() => {
+                            confirmSave("large");
+                        }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                    </button>
+                    <figure class="w-1/2">
+                        <img class="object-cover" src={avatar} alt="Album" />
+                    </figure>
+                    <div class="card-body">
+                        <div class="flex flex-col items-center mb-5">
+                            <div class="font-bold sm:text-lg xl:text-xl 2xl:text-2xl text-red-500">
+                                <input
+                                    type="text"
+                                    placeholder={currentProfile.userName}
+                                    class="username-input input input-ghost text-center font-bold sm:text-lg xl:text-xl 2xl:text-2xl placeholder-red-500"
+                                    onKeyUp={() => {
+                                        inputFill("", ".username-input");
+                                    }}
+                                />
+                            </div>
+                            <div class="badge badge-info">
+                                {currentProfile.role === undefined
+                                    ? ""
+                                    : toTitleCase(currentProfile.role)}
+                            </div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="name-title">Họ và tên:&nbsp;</div>
+                            <input
+                                type="text"
+                                placeholder={
+                                    currentProfile.fullName === undefined
+                                        ? ""
+                                        : toTitleCase(currentProfile.fullName)
+                                }
+                                class="name-input input input-ghost sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black"
+                                onKeyUp={() => {
+                                    inputFill(".name-title", ".name-input");
+                                }}
+                            />
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="email-title">Email:&nbsp;</div>
+                            <input
+                                type="text"
+                                placeholder={currentProfile.email}
+                                class="email-input input input-ghost sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black"
+                                onKeyUp={() => {
+                                    inputFill(".email-title", ".email-input");
+                                }}
+                            />
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="phone-title">Điện thoại:&nbsp;</div>
+                            <input
+                                type="text"
+                                placeholder={currentProfile.phoneNumber}
+                                class="phone-input input input-ghost sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black"
+                                onKeyUp={() => {
+                                    inputFill(".phone-title", ".phone-input");
+                                }}
+                            />
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="gender-title">Giới tính:&nbsp;</div>
+                            <input
+                                type="text"
+                                placeholder={currentProfile.gender === "male" ? "Nam" : "Nữ"}
+                                class="gender-input input input-ghost sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black"
+                                onKeyUp={() => {
+                                    inputFill(".gender-title", ".gender-input");
+                                }}
+                            />
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="flex-none facebook-title">Facebook:&nbsp;</div>
+                            <input
+                                type="text"
+                                placeholder={currentProfile.accountFacebook}
+                                class="facebook-input input input-ghost w-full sm:text-base xl:text-lg 2xl:text-xl p-0 h-7 placeholder-black"
+                                onKeyUp={() => {
+                                    inputFill(".facebook-title", ".facebook-input");
+                                }}
+                            />
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="birth-title">Ngày sinh:&nbsp;</div>
+                            <input
+                                type="text"
+                                placeholder={currentProfile.dayOfBirth}
+                                class="birth-input input input-ghost sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black"
+                                onKeyUp={() => {
+                                    inputFill(".birth-title", ".birth-input");
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="lg:hidden">
                 <div class="flex flex-col w-full p-5">
@@ -511,7 +809,13 @@ function UserManage() {
                                                 <td class="text-sm">{obj.userName}</td>
                                                 <td class="text-sm">{toTitleCase(obj.role)}</td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-xs btn-square btn-info brightness-200 m-1">
+                                                    <button
+                                                        class="btn btn-xs btn-square btn-info brightness-200 m-1"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            editUserProfile(index);
+                                                        }}
+                                                    >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             class="h-4 w-4"
@@ -672,7 +976,7 @@ function UserManage() {
                                 <div>{currentProfile.email}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
-                                <div>Số điện thoại:&nbsp;</div>
+                                <div>Điện thoại:&nbsp;</div>
                                 <div>{currentProfile.phoneNumber}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
@@ -680,7 +984,7 @@ function UserManage() {
                                 <div>{currentProfile.gender === "male" ? "Nam" : "Nữ"}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
-                                <div>Tài khoản Facebook:&nbsp;</div>
+                                <div>Facebook:&nbsp;</div>
                                 <div>{currentProfile.accountFacebook}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
@@ -721,7 +1025,7 @@ function UserManage() {
                                 <div>{currentProfile.email}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
-                                <div>Số điện thoại:&nbsp;</div>
+                                <div>Điện thoại:&nbsp;</div>
                                 <div>{currentProfile.phoneNumber}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
@@ -729,7 +1033,7 @@ function UserManage() {
                                 <div>{currentProfile.gender === "male" ? "Nam" : "Nữ"}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
-                                <div>Tài khoản Facebook:&nbsp;</div>
+                                <div>Facebook:&nbsp;</div>
                                 <div>{currentProfile.accountFacebook}</div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
@@ -779,6 +1083,137 @@ function UserManage() {
                                 Xóa ngay
                             </button>
                         </div>
+                    </div>
+                </div>
+                <div class="card card-side bg-base-200 shadow-2xl max-w-[60%] absolute top-[30%] sm:top-[25%] md:top-[15%] left-[20%] z-20 edit-profile layer-hidden">
+                    <div class="card-body p-0">
+                        <div class="flex w-full items-center">
+                            <figure class="w-1/2">
+                                <img class="object-cover" src={avatar} alt="Album" />
+                            </figure>
+                            <div class="flex flex-col items-center w-1/2 mx-2">
+                                <div class="font-bold text-lg sm:text-xl md:text-2xl text-red-500">
+                                    <input
+                                        type="text"
+                                        placeholder={currentProfile.userName}
+                                        class="small-username-input input w-full input-ghost text-center font-bold text-lg sm:text-xl md:text-2xl placeholder-red-500"
+                                        onKeyUp={() => {
+                                            inputFill("", ".small-username-input");
+                                        }}
+                                    />
+                                </div>
+                                <div class="badge badge-info">
+                                    {currentProfile.role === undefined
+                                        ? ""
+                                        : toTitleCase(currentProfile.role)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col">
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="small-name-title flex-none sm:text-lg md:text-xl">
+                                    Họ và tên:&nbsp;
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={
+                                        currentProfile.fullName === undefined
+                                            ? ""
+                                            : toTitleCase(currentProfile.fullName)
+                                    }
+                                    class="small-name-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    onKeyUp={() => {
+                                        inputFill(".small-name-title", ".small-name-input");
+                                    }}
+                                />
+                            </div>
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="small-email-title flex-none sm:text-lg md:text-xl">
+                                    Email:&nbsp;
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={currentProfile.email}
+                                    class="small-email-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    onKeyUp={() => {
+                                        inputFill(".small-email-title", ".small-email-input");
+                                    }}
+                                />
+                            </div>
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="small-phone-title flex-none sm:text-lg md:text-xl">
+                                    Điện thoại:&nbsp;
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={currentProfile.phoneNumber}
+                                    class="small-phone-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    onKeyUp={() => {
+                                        inputFill(".small-phone-title", ".small-phone-input");
+                                    }}
+                                />
+                            </div>
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="small-gender-title flex-none sm:text-lg md:text-xl">
+                                    Giới tính:&nbsp;
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={currentProfile.gender === "male" ? "Nam" : "Nữ"}
+                                    class="small-gender-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    onKeyUp={() => {
+                                        inputFill(".small-gender-title", ".small-gender-input");
+                                    }}
+                                />
+                            </div>
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="flex-none small-facebook-title sm:text-lg md:text-xl">
+                                    Facebook:&nbsp;
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={currentProfile.accountFacebook}
+                                    class="small-facebook-input input input-ghost w-full sm:text-lg md:text-xl p-0 h-6 placeholder-black"
+                                    onKeyUp={() => {
+                                        inputFill(".small-facebook-title", ".small-facebook-input");
+                                    }}
+                                />
+                            </div>
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="small-birth-title flex-none sm:text-lg md:text-xl">
+                                    Ngày sinh:&nbsp;
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={currentProfile.dayOfBirth}
+                                    class="small-birth-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    onKeyUp={() => {
+                                        inputFill(".small-birth-title", ".small-birth-input");
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <button
+                            className="small-save-button btn btn-success btn-disabled brightness-125"
+                            onClick={() => {
+                                confirmSave("small");
+                            }}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#ffffff"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>

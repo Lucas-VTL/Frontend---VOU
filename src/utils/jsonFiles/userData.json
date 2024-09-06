@@ -19,7 +19,7 @@
     "phoneNumber": "0123456789",
     "role": "admin",
     "status": "true",
-    "gender": "male",
+    "gender": "female",
     "accountFacebook": "",
     "dayOfBirth": "29/07/2003",
     "avatar": ""
@@ -30,7 +30,7 @@
     "email": "bbb1106@gmai.com",
     "phoneNumber": "0123456789",
     "role": "brand",
-    "status": "false",
+    "status": "true",
     "gender": "male",
     "accountFacebook": "",
     "dayOfBirth": "03/02/2003",
@@ -56,7 +56,7 @@
     "phoneNumber": "0123456789",
     "role": "customer",
     "status": "false",
-    "gender": "male",
+    "gender": "female",
     "accountFacebook": "",
     "dayOfBirth": "29/12/2003",
     "avatar": ""
