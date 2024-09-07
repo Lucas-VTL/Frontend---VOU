@@ -288,8 +288,25 @@ function UserManage() {
             });
         }
 
-        console.log(valueList);
-        hideUserProfile();
+        const titleList = [
+            ".name-title",
+            ".email-title",
+            ".phone-title",
+            ".gender-title",
+            ".facebook-title",
+            ".birth-title",
+            ".small-name-title",
+            ".small-email-title",
+            ".small-phone-title",
+            ".small-gender-title",
+            ".small-facebook-title",
+            ".small-birth-title",
+        ];
+
+        titleList.forEach((title) => {
+            var titleName = document.querySelector(title);
+            titleName.style.color = "black";
+        });
     };
 
     useEffect(() => {
@@ -332,11 +349,6 @@ function UserManage() {
             }
         });
 
-        var genderTitle = document.querySelector(".gender-title");
-        if (genderTitle.style.color === "rgb(242, 82, 82)") {
-            count += 1;
-        }
-
         setUpdateData(count);
 
         var saveButton = document.querySelector(".save-button");
@@ -367,11 +379,6 @@ function UserManage() {
                 }
             }
         });
-
-        var smallGenderTitle = document.querySelector(".small-gender-title");
-        if (smallGenderTitle.style.color === "rgb(242, 82, 82)") {
-            smallCount += 1;
-        }
 
         setSmallUpdateData(smallCount);
 
