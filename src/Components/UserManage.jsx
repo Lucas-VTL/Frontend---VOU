@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import userData from "../utils/jsonFiles/userData.json";
 import avatar from "../utils/images/ava.jpg";
-import "../Styles/UserManage.css";
+import "../Styles/Manage.css";
 
 function UserManage() {
     const [allProfileData, setAllProfileData] = useState([]);
@@ -316,7 +316,7 @@ function UserManage() {
 
         var keys = Object.keys(userData);
         keys.forEach(function (key) {
-            if (userData[key].status === "true") {
+            if (userData[key].status) {
                 userList.push(userData[key]);
             } else {
                 newUserList.push(userData[key]);
