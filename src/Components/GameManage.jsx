@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import React, { useEffect, useState } from "react";
 import gameData from "../utils/jsonFiles/gameData.json";
 import avatar from "../utils/images/ava.jpg";
@@ -6,8 +7,6 @@ import "../Styles/Manage.css";
 function GameManage() {
     const [gameProfile, setGameProfile] = useState([]);
     const [currentGameProfile, setCurrentGameProfile] = useState({});
-    const [updateData, setUpdateData] = useState(0);
-    const [smallUpdateData, setSmallUpdateData] = useState(0);
 
     const toTitleCase = (phrase) => {
         return phrase
@@ -38,6 +37,7 @@ function GameManage() {
         const layerBlur = document.querySelectorAll(".layer-blur");
         const removeProfile = document.querySelectorAll(".remove-profile");
         const editProfile = document.querySelectorAll(".edit-profile");
+        const addProfile = document.querySelectorAll(".add-profile");
 
         layerBlur.forEach((layer) => {
             layer.classList.remove("layer-show");
@@ -54,6 +54,11 @@ function GameManage() {
             layer.classList.add("layer-hidden");
         });
 
+        addProfile.forEach((layer) => {
+            layer.classList.remove("layer-show");
+            layer.classList.add("layer-hidden");
+        });
+
         var allInputList = [
             ".name-input",
             ".type-input",
@@ -63,12 +68,27 @@ function GameManage() {
             ".small-type-input",
             ".small-itemSwap-input",
             ".small-instruction-input",
+            ".add-ava-input",
+            ".add-name-input",
+            ".add-type-input",
+            ".add-itemSwap-input",
+            ".add-instruction-input",
+            ".small-add-ava-input",
+            ".small-add-name-input",
+            ".small-add-type-input",
+            ".small-add-itemSwap-input",
+            ".small-add-instruction-input",
         ];
 
         allInputList.forEach((input) => {
             var inputValue = document.querySelector(input);
             inputValue.value = "";
         });
+
+        document.querySelector(".add-ava-image").classList.add("hidden");
+        document.querySelector(".add-ava-button").classList.remove("hidden");
+        document.querySelector(".small-add-ava-image").classList.add("hidden");
+        document.querySelector(".small-add-ava-button").classList.remove("hidden");
     };
 
     const removeGameProfile = (profileIndex, status) => {
@@ -182,7 +202,58 @@ function GameManage() {
         });
     };
 
+    const confirmAdd = (buttonSize) => {
+        var valueList = [];
+
+        if (buttonSize === "large") {
+            const inputList = [
+                ".add-name-input",
+                ".add-name-input",
+                ".add-type-input",
+                ".add-itemSwap-input",
+                ".add-instruction-input",
+            ];
+
+            inputList.forEach((input) => {
+                var inputValue = document.querySelector(input);
+                valueList.push(inputValue.value);
+            });
+        } else {
+            const inputList = [
+                ".small-add-name-input",
+                ".small-add-name-input",
+                ".small-add-type-input",
+                ".small-add-itemSwap-input",
+                ".small-add-instruction-input",
+            ];
+
+            inputList.forEach((input) => {
+                var inputValue = document.querySelector(input);
+                valueList.push(inputValue.value);
+            });
+        }
+
+        hideUserProfile();
+    };
+
+    const addGameProfile = () => {
+        const layerBlur = document.querySelectorAll(".layer-blur");
+        const addProfile = document.querySelectorAll(".add-profile");
+
+        layerBlur.forEach((layer) => {
+            layer.classList.remove("layer-hidden");
+            layer.classList.add("layer-show");
+        });
+
+        addProfile.forEach((layer) => {
+            layer.classList.remove("layer-hidden");
+            layer.classList.add("layer-show");
+        });
+    };
+
     useEffect(() => {
+        var count;
+
         var gameList = [];
         var keys = Object.keys(gameData);
         keys.forEach(function (key) {
@@ -192,8 +263,7 @@ function GameManage() {
         setGameProfile(gameList);
 
         const inputList = [".name-input", ".type-input", ".itemSwap-input", ".instruction-input"];
-
-        var count = 0;
+        count = 0;
 
         inputList.forEach((input) => {
             var inputValue = document.querySelector(input);
@@ -204,11 +274,9 @@ function GameManage() {
             }
         });
 
-        setUpdateData(count);
-
         var saveButton = document.querySelector(".save-button");
 
-        if (updateData > 0) {
+        if (count > 0) {
             saveButton.classList.remove("btn-disabled");
         } else {
             saveButton.classList.add("btn-disabled");
@@ -221,25 +289,97 @@ function GameManage() {
             ".small-instruction-input",
         ];
 
-        var smallCount = 0;
+        count = 0;
 
         smallInputList.forEach((input) => {
             var inputValue = document.querySelector(input);
             if (inputValue.value !== "") {
                 if (inputValue.placeholder !== inputValue.value) {
-                    smallCount += 1;
+                    count += 1;
                 }
             }
         });
 
-        setSmallUpdateData(smallCount);
-
         var smallSaveButton = document.querySelector(".small-save-button");
 
-        if (smallUpdateData > 0) {
+        if (count > 0) {
             smallSaveButton.classList.remove("btn-disabled");
         } else {
             smallSaveButton.classList.add("btn-disabled");
+        }
+
+        const addInputList = [
+            ".add-ava-input",
+            ".add-name-input",
+            ".add-type-input",
+            ".add-itemSwap-input",
+            ".add-instruction-input",
+        ];
+
+        count = 0;
+
+        var addButton = document.querySelector(".add-button");
+
+        addInputList.forEach((input) => {
+            var inputValue = document.querySelector(input);
+            if (inputValue.value !== "") {
+                count += 1;
+            }
+        });
+
+        if (count === 5) {
+            addButton.classList.remove("btn-disabled");
+        } else {
+            addButton.classList.add("btn-disabled");
+        }
+
+        if (document.querySelector(".add-ava-input").value !== "") {
+            var input = document.querySelector(".add-ava-input");
+            var fReader = new FileReader();
+            fReader.readAsDataURL(input.files[0]);
+            fReader.onloadend = function (event) {
+                document.querySelector(".add-ava-image").src = event.target.result;
+            };
+
+            document.querySelector(".add-ava-image").classList.remove("hidden");
+            document.querySelector(".add-ava-button").classList.add("hidden");
+        }
+
+        const smallAddInputList = [
+            ".small-add-ava-input",
+            ".small-add-name-input",
+            ".small-add-type-input",
+            ".small-add-itemSwap-input",
+            ".small-add-instruction-input",
+        ];
+
+        count = 0;
+
+        var smallAddButton = document.querySelector(".small-add-button");
+
+        smallAddInputList.forEach((input) => {
+            var inputValue = document.querySelector(input);
+            if (inputValue.value !== "") {
+                count += 1;
+            }
+        });
+
+        if (count === 5) {
+            smallAddButton.classList.remove("btn-disabled");
+        } else {
+            smallAddButton.classList.add("btn-disabled");
+        }
+
+        if (document.querySelector(".small-add-ava-input").value !== "") {
+            var smallInput = document.querySelector(".small-add-ava-input");
+            var smallfReader = new FileReader();
+            smallfReader.readAsDataURL(smallInput.files[0]);
+            smallfReader.onloadend = function (event) {
+                document.querySelector(".small-add-ava-image").src = event.target.result;
+            };
+
+            document.querySelector(".small-add-ava-image").classList.remove("hidden");
+            document.querySelector(".small-add-ava-button").classList.add("hidden");
         }
 
         return () => {};
@@ -339,6 +479,36 @@ function GameManage() {
                                         </tr>
                                     );
                                 })}
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="text-center">
+                                        <button
+                                            class="btn btn-success brightness-125 w-[65%]"
+                                            onClick={() => {
+                                                addGameProfile();
+                                            }}
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-10 h-10"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="#ffffff"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            >
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -452,6 +622,94 @@ function GameManage() {
                             </div>
                         </div>
                     </div>
+                    <div class="card lg:card-side bg-base-200 shadow-2xl sm:w-[65%] xl:w-[55%] 2xl:w-[55%] absolute top-[20%] sm:left-[22%] xl:left-[24%] 2xl:left-[24%] z-20 add-profile layer-hidden">
+                        <button
+                            className="add-button btn btn-circle btn-success btn-disabled brightness-125 absolute sm:top-[83%] sm:left-[91%] xl:top-[84%%] xl:left-[92%] 2xl:top-[85%] 2xl:left-[93%]"
+                            onClick={() => {
+                                confirmAdd("large");
+                            }}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#ffffff"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                        </button>
+                        <figure class="w-1/2">
+                            <img
+                                class="object-cover add-ava-image hidden cursor-pointer"
+                                alt="Album"
+                                onClick={() => {
+                                    document.querySelector(".add-ava-input").click();
+                                }}
+                            />
+                            <button
+                                class="add-ava-button btn btn-circle border-black w-1/3 h-1/3"
+                                onClick={() => {
+                                    document.querySelector(".add-ava-input").click();
+                                }}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-10 w-10"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <path d="M20.4 14.5L16 10 4 20" />
+                                </svg>
+                                <input
+                                    type="file"
+                                    class="add-ava-input hidden"
+                                    accept=".jpg,.jpeg,.png"
+                                />
+                            </button>
+                        </figure>
+                        <div class="card-body">
+                            <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                                <div class="flex-none">Tên trò chơi:&nbsp;</div>
+                                <input
+                                    type="text"
+                                    class="add-name-input input sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black w-full"
+                                />
+                            </div>
+                            <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                                <div class="flex-none">Thể loại:&nbsp;</div>
+                                <input
+                                    type="text"
+                                    class="add-type-input input sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black w-full"
+                                />
+                            </div>
+                            <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                                <div class="flex-none">Áp dụng đổi vật phẩm:&nbsp;</div>
+                                <input
+                                    type="text"
+                                    class="add-itemSwap-input input sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black w-full"
+                                />
+                            </div>
+                            <div class="flex flex-col sm:text-base xl:text-lg 2xl:text-xl">
+                                <div class="flex-none text-left">Hướng dẫn trò chơi:&nbsp;</div>
+                                <textarea
+                                    type="text"
+                                    class="add-instruction-input input sm:text-base xl:text-lg 2xl:text-xl p-0 placeholder-black h-36 w-full overflow-x-hidden"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="lg:hidden">
@@ -526,6 +784,33 @@ function GameManage() {
                                         </tr>
                                     );
                                 })}
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="text-center">
+                                        <button
+                                            class="btn btn-success brightness-125 w-[65%]"
+                                            onClick={() => {
+                                                addGameProfile();
+                                            }}
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-8 h-8"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="#ffffff"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            >
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -632,6 +917,106 @@ function GameManage() {
                                 className="small-save-button btn btn-success btn-disabled brightness-125"
                                 onClick={() => {
                                     confirmSave("small");
+                                }}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#ffffff"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card card-side bg-base-200 shadow-2xl max-w-[60%] absolute top-[30%] sm:top-[28%] md:top-[25%] left-[20%] z-20 add-profile layer-hidden">
+                        <div class="card-body p-0">
+                            <div class="flex items-center">
+                                <figure class="w-full">
+                                    <img
+                                        class="object-cover small-add-ava-image hidden cursor-pointer"
+                                        alt="Album"
+                                        onClick={() => {
+                                            document.querySelector(".small-add-ava-input").click();
+                                        }}
+                                    />
+                                    <button
+                                        class="small-add-ava-button btn btn-circle border-black mt-3"
+                                        onClick={() => {
+                                            document.querySelector(".small-add-ava-input").click();
+                                        }}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-8 w-8"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="#000000"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                                            <circle cx="8.5" cy="8.5" r="1.5" />
+                                            <path d="M20.4 14.5L16 10 4 20" />
+                                        </svg>
+                                        <input
+                                            type="file"
+                                            class="small-add-ava-input hidden"
+                                            accept=".jpg,.jpeg,.png"
+                                        />
+                                    </button>
+                                </figure>
+                            </div>
+                            <div class="p-4 flex flex-col">
+                                <div class="flex text-base sm:text-lg md:text-xl my-1">
+                                    <div class="flex-none sm:text-lg md:text-xl">
+                                        Tên trò chơi:&nbsp;
+                                    </div>
+                                    <input
+                                        type="text"
+                                        class="small-add-name-input input sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
+                                    />
+                                </div>
+                                <div class="flex text-base sm:text-lg md:text-xl my-1">
+                                    <div class="flex-none sm:text-lg md:text-xl">
+                                        Thể loại:&nbsp;
+                                    </div>
+                                    <input
+                                        type="text"
+                                        class="small-add-type-input input sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
+                                    />
+                                </div>
+                                <div class="flex text-base sm:text-lg md:text-xl my-1">
+                                    <div class="flex-none sm:text-lg md:text-xl">
+                                        Áp dụng đổi vật phẩm:&nbsp;
+                                    </div>
+                                    <input
+                                        type="text"
+                                        class="small-add-itemSwap-input input sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
+                                    />
+                                </div>
+                                <div class="flex flex-col text-base sm:text-lg md:text-xl">
+                                    <div class="flex-none sm:text-lg md:text-xl">
+                                        Hướng dẫn trò chơi:&nbsp;
+                                    </div>
+                                    <textarea
+                                        type="text"
+                                        class="small-add-instruction-input input sm:text-lg md:text-xl p-0 placeholder-black overflow-x-hidden h-20 w-full"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                className="small-add-button btn btn-success btn-disabled brightness-125"
+                                onClick={() => {
+                                    confirmAdd("small");
                                 }}
                             >
                                 <svg

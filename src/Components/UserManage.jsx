@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import userData from "../utils/jsonFiles/userData.json";
 import avatar from "../utils/images/ava.jpg";
@@ -8,8 +9,6 @@ function UserManage() {
     const [profileData, setProfileData] = useState([]);
     const [newProfileData, setNewProfileData] = useState([]);
     const [currentProfile, setCurrentProfile] = useState({});
-    const [updateData, setUpdateData] = useState(0);
-    const [smallUpdateData, setSmallUpdateData] = useState(0);
 
     const toTitleCase = (phrase) => {
         return phrase
@@ -19,7 +18,7 @@ function UserManage() {
             .join(" ");
     };
 
-    const showUserProfile = (profileIndex, status) => {
+    const showUserProfile = (profileIndex) => {
         const layerBlur = document.querySelectorAll(".layer-blur");
         const userProfile = document.querySelectorAll(".user-profile");
 
@@ -33,13 +32,9 @@ function UserManage() {
             layer.classList.add("layer-show");
         });
 
-        var count = -1;
-
-        allProfileData.forEach((item) => {
-            if (item.status === status.toString()) {
-                if (++count === profileIndex) {
-                    setCurrentProfile(item);
-                }
+        profileData.forEach((item, index) => {
+            if (index === profileIndex) {
+                setCurrentProfile(item);
             }
         });
     };
@@ -253,8 +248,6 @@ function UserManage() {
                 ".username-input",
                 ".name-input",
                 ".email-input",
-                ".phone-input",
-                ".gender-input",
                 ".facebook-input",
                 ".birth-input",
             ];
@@ -316,7 +309,7 @@ function UserManage() {
 
         var keys = Object.keys(userData);
         keys.forEach(function (key) {
-            if (userData[key].status) {
+            if (userData[key].status !== "Pending") {
                 userList.push(userData[key]);
             } else {
                 newUserList.push(userData[key]);
@@ -333,7 +326,6 @@ function UserManage() {
             ".name-input",
             ".email-input",
             ".phone-input",
-            ".gender-input",
             ".facebook-input",
             ".birth-input",
         ];
@@ -349,11 +341,29 @@ function UserManage() {
             }
         });
 
-        setUpdateData(count);
+        var genderInput = document.querySelector(".gender-input");
+
+        if (genderInput.innerHTML !== (currentProfile.gender === "male" ? "Nam" : "Nữ")) {
+            document.querySelector(".gender-title").style.color = "rgb(242, 82, 82)";
+            count += 1;
+        } else {
+            document.querySelector(".gender-title").style.color = "black";
+        }
+
+        var statusInput = document.querySelector(".status-input");
+
+        if (
+            statusInput.innerHTML !== (currentProfile.gender === "Active" ? "Hoạt động" : "Bị khóa")
+        ) {
+            document.querySelector(".status-title").style.color = "rgb(242, 82, 82)";
+            count += 1;
+        } else {
+            document.querySelector(".status-title").style.color = "black";
+        }
 
         var saveButton = document.querySelector(".save-button");
 
-        if (updateData > 0) {
+        if (count > 0) {
             saveButton.classList.remove("btn-disabled");
         } else {
             saveButton.classList.add("btn-disabled");
@@ -364,7 +374,6 @@ function UserManage() {
             ".small-name-input",
             ".small-email-input",
             ".small-phone-input",
-            ".small-gender-input",
             ".small-facebook-input",
             ".small-birth-input",
         ];
@@ -380,18 +389,37 @@ function UserManage() {
             }
         });
 
-        setSmallUpdateData(smallCount);
+        var smallGenderInput = document.querySelector(".small-gender-input");
+
+        if (smallGenderInput.innerHTML !== (currentProfile.gender === "male" ? "Nam" : "Nữ")) {
+            document.querySelector(".small-gender-title").style.color = "rgb(242, 82, 82)";
+            smallCount += 1;
+        } else {
+            document.querySelector(".small-gender-title").style.color = "black";
+        }
+
+        var smallStatusInput = document.querySelector(".small-status-input");
+
+        if (
+            smallStatusInput.innerHTML !==
+            (currentProfile.gender === "Active" ? "Hoạt động" : "Bị khóa")
+        ) {
+            document.querySelector(".small-status-title").style.color = "rgb(242, 82, 82)";
+            smallCount += 1;
+        } else {
+            document.querySelector(".small-status-title").style.color = "black";
+        }
 
         var smallSaveButton = document.querySelector(".small-save-button");
 
-        if (smallUpdateData > 0) {
+        if (smallCount > 0) {
             smallSaveButton.classList.remove("btn-disabled");
         } else {
             smallSaveButton.classList.add("btn-disabled");
         }
 
         return () => {};
-    }, [profileData, newProfileData, allProfileData, updateData, smallUpdateData, currentProfile]);
+    }, [profileData, newProfileData, allProfileData, currentProfile]);
 
     return (
         <div class="bg-white font-Kanit" data-theme="retro">
@@ -412,13 +440,13 @@ function UserManage() {
                                             Tên tài khoản
                                         </th>
                                         <th class="font-bold text-red-500 sm:text-sm xl:text-base 2xl:text-base">
-                                            Họ và tên
-                                        </th>
-                                        <th class="font-bold text-red-500 sm:text-sm xl:text-base 2xl:text-base">
                                             Email
                                         </th>
                                         <th class="font-bold text-red-500 sm:text-sm xl:text-base 2xl:text-base">
                                             Vai trò
+                                        </th>
+                                        <th class="font-bold text-red-500 sm:text-sm xl:text-base 2xl:text-base">
+                                            Trạng thái
                                         </th>
                                         <th class="font-bold text-red-500 sm:text-sm xl:text-base 2xl:text-base text-center">
                                             Chỉnh sửa
@@ -431,14 +459,18 @@ function UserManage() {
                                             <tr
                                                 class="hover cursor-pointer"
                                                 onClick={() => {
-                                                    showUserProfile(index, true);
+                                                    showUserProfile(index);
                                                 }}
                                             >
                                                 <td>{index + 1}</td>
-                                                <td>{obj.userName}</td>
                                                 <td>{toTitleCase(obj.fullName)}</td>
                                                 <td>{obj.email}</td>
                                                 <td>{toTitleCase(obj.role)}</td>
+                                                <td>
+                                                    {obj.status === "Active"
+                                                        ? "Hoạt động"
+                                                        : "Bị khóa"}
+                                                </td>
                                                 <td class="text-center">
                                                     <button
                                                         class="btn btn-sm btn-square btn-info brightness-200 m-1"
@@ -524,7 +556,7 @@ function UserManage() {
                                             <tr
                                                 class="hover cursor-pointer"
                                                 onClick={() => {
-                                                    showUserProfile(index, false);
+                                                    showNewUserProfile(index);
                                                 }}
                                             >
                                                 <td>{index + 1}</td>
@@ -623,6 +655,63 @@ function UserManage() {
                             <div>Ngày sinh:&nbsp;</div>
                             <div>{currentProfile.dayOfBirth}</div>
                         </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Trạng thái:&nbsp;</div>
+                            <div>
+                                {currentProfile.status === "Active" ? "Hoạt động" : "Bị khóa"}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card lg:card-side bg-base-200 shadow-2xl sm:w-[65%] xl:w-[55%] 2xl:w-[55%] absolute top-[20%] sm:left-[22%] xl:left-[24%] 2xl:left-[24%] z-20 new-user-profile layer-hidden">
+                    <figure class="w-1/2">
+                        <img class="object-cover" src={avatar} alt="Album" />
+                    </figure>
+                    <div class="card-body">
+                        <div class="flex flex-col items-center mb-5">
+                            <div class="font-bold sm:text-lg xl:text-xl 2xl:text-2xl text-red-500">
+                                {currentProfile.userName}
+                            </div>
+                            <div class="badge badge-info">
+                                {currentProfile.role === undefined
+                                    ? ""
+                                    : toTitleCase(currentProfile.role)}
+                            </div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Họ và tên:&nbsp;</div>
+                            <div>
+                                {currentProfile.fullName === undefined
+                                    ? ""
+                                    : toTitleCase(currentProfile.fullName)}
+                            </div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Email:&nbsp;</div>
+                            <div>{currentProfile.email}</div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Điện thoại:&nbsp;</div>
+                            <div>{currentProfile.phoneNumber}</div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Giới tính:&nbsp;</div>
+                            <div>{currentProfile.gender === "male" ? "Nam" : "Nữ"}</div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Facebook:&nbsp;</div>
+                            <div>{currentProfile.accountFacebook}</div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Ngày sinh:&nbsp;</div>
+                            <div>{currentProfile.dayOfBirth}</div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div>Trạng thái:&nbsp;</div>
+                            <div>
+                                {currentProfile.status === "Active" ? "Hoạt động" : "Bị khóa"}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card bg-base-200 shadow-2xl w-[25%] absolute top-[30%] left-[40%] z-20 remove-profile layer-hidden">
@@ -669,7 +758,7 @@ function UserManage() {
                 </div>
                 <div class="card lg:card-side bg-base-200 shadow-2xl sm:w-[65%] xl:w-[55%] 2xl:w-[55%] absolute top-[20%] sm:left-[22%] xl:left-[24%] 2xl:left-[24%] z-20 edit-profile layer-hidden">
                     <button
-                        className="save-button btn btn-circle btn-success btn-disabled brightness-125 absolute sm:top-[83%] sm:left-[91%] xl:top-[84%%] xl:left-[92%] 2xl:top-[85%] 2xl:left-[93%]"
+                        className="save-button btn btn-circle btn-success btn-disabled brightness-125 absolute sm:top-[86%] sm:left-[93%] xl:top-[88%%] xl:left-[93%] 2xl:top-[88%] 2xl:left-[93%]"
                         onClick={() => {
                             confirmSave("large");
                         }}
@@ -748,15 +837,78 @@ function UserManage() {
                             />
                         </div>
                         <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
-                            <div class="gender-title">Giới tính:&nbsp;</div>
-                            <input
-                                type="text"
-                                placeholder={currentProfile.gender === "male" ? "Nam" : "Nữ"}
-                                class="gender-input input input-ghost sm:text-base xl:text-lg 2xl:text-xl whitespace-nowrap p-0 h-7 placeholder-black"
-                                onKeyUp={() => {
-                                    inputFill(".gender-title", ".gender-input");
-                                }}
-                            />
+                            <div class="gender-title flex-none">Giới tính:&nbsp;</div>
+                            <div class="dropdown p-0 h-7">
+                                <div
+                                    tabindex="0"
+                                    role="button"
+                                    class="gender-input sm:text-base xl:text-lg 2xl:text-xl font-normal p-0 h-7"
+                                >
+                                    {currentProfile.gender === "male" ? "Nam" : "Nữ"}
+                                </div>
+                                <ul
+                                    tabindex="0"
+                                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                                >
+                                    <li>
+                                        <a
+                                            onClick={() => {
+                                                document.querySelector(".gender-input").innerHTML =
+                                                    "Nam";
+                                            }}
+                                        >
+                                            Nam
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            onClick={() => {
+                                                document.querySelector(".gender-input").innerHTML =
+                                                    "Nữ";
+                                            }}
+                                        >
+                                            Nữ
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
+                            <div class="status-title flex-none">Trạng thái:&nbsp;</div>
+                            <div class="dropdown p-0 h-7">
+                                <div
+                                    tabindex="0"
+                                    role="button"
+                                    class="status-input sm:text-base xl:text-lg 2xl:text-xl font-normal p-0 h-7"
+                                >
+                                    {currentProfile.status === "Active" ? "Hoạt động" : "Bị khóa"}
+                                </div>
+                                <ul
+                                    tabindex="0"
+                                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                                >
+                                    <li>
+                                        <a
+                                            onClick={() => {
+                                                document.querySelector(".status-input").innerHTML =
+                                                    "Hoạt động";
+                                            }}
+                                        >
+                                            Hoạt động
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            onClick={() => {
+                                                document.querySelector(".status-input").innerHTML =
+                                                    "Bị khóa";
+                                            }}
+                                        >
+                                            Bị khóa
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="flex sm:text-base xl:text-lg 2xl:text-xl">
                             <div class="flex-none facebook-title">Facebook:&nbsp;</div>
@@ -1092,7 +1244,7 @@ function UserManage() {
                         </div>
                     </div>
                 </div>
-                <div class="card card-side bg-base-200 shadow-2xl max-w-[60%] absolute top-[30%] sm:top-[25%] md:top-[15%] left-[20%] z-20 edit-profile layer-hidden">
+                <div class="card card-side bg-base-200 shadow-2xl max-w-[60%] absolute top-[30%] sm:top-[25%] md:top-[25%] left-[20%] z-20 edit-profile layer-hidden">
                     <div class="card-body p-0">
                         <div class="flex w-full items-center">
                             <figure class="w-1/2">
@@ -1128,7 +1280,7 @@ function UserManage() {
                                             ? ""
                                             : toTitleCase(currentProfile.fullName)
                                     }
-                                    class="small-name-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    class="small-name-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
                                     onKeyUp={() => {
                                         inputFill(".small-name-title", ".small-name-input");
                                     }}
@@ -1141,7 +1293,7 @@ function UserManage() {
                                 <input
                                     type="text"
                                     placeholder={currentProfile.email}
-                                    class="small-email-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    class="small-email-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
                                     onKeyUp={() => {
                                         inputFill(".small-email-title", ".small-email-input");
                                     }}
@@ -1154,7 +1306,7 @@ function UserManage() {
                                 <input
                                     type="text"
                                     placeholder={currentProfile.phoneNumber}
-                                    class="small-phone-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    class="small-phone-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
                                     onKeyUp={() => {
                                         inputFill(".small-phone-title", ".small-phone-input");
                                     }}
@@ -1164,14 +1316,85 @@ function UserManage() {
                                 <div class="small-gender-title flex-none sm:text-lg md:text-xl">
                                     Giới tính:&nbsp;
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder={currentProfile.gender === "male" ? "Nam" : "Nữ"}
-                                    class="small-gender-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
-                                    onKeyUp={() => {
-                                        inputFill(".small-gender-title", ".small-gender-input");
-                                    }}
-                                />
+                                <div class="dropdown p-0 h-6">
+                                    <div
+                                        tabindex="0"
+                                        role="button"
+                                        class="small-gender-input text-base sm:text-lg md:text-xl font-normal p-0 h-6"
+                                    >
+                                        {currentProfile.gender === "male" ? "Nam" : "Nữ"}
+                                    </div>
+                                    <ul
+                                        tabindex="0"
+                                        class="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
+                                    >
+                                        <li>
+                                            <a
+                                                onClick={() => {
+                                                    document.querySelector(
+                                                        ".small-gender-input"
+                                                    ).innerHTML = "Nam";
+                                                }}
+                                            >
+                                                Nam
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                onClick={() => {
+                                                    document.querySelector(
+                                                        ".small-gender-input"
+                                                    ).innerHTML = "Nữ";
+                                                }}
+                                            >
+                                                Nữ
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="flex text-base sm:text-lg md:text-xl">
+                                <div class="small-status-title flex-none sm:text-lg md:text-xl">
+                                    Trạng thái:&nbsp;
+                                </div>
+                                <div class="dropdown p-0 h-6">
+                                    <div
+                                        tabindex="0"
+                                        role="button"
+                                        class="small-status-input text-base sm:text-lg md:text-xl font-normal p-0 h-6"
+                                    >
+                                        {currentProfile.status === "Active"
+                                            ? "Hoạt động"
+                                            : "Bị khóa"}
+                                    </div>
+                                    <ul
+                                        tabindex="0"
+                                        class="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
+                                    >
+                                        <li>
+                                            <a
+                                                onClick={() => {
+                                                    document.querySelector(
+                                                        ".small-status-input"
+                                                    ).innerHTML = "Hoạt động";
+                                                }}
+                                            >
+                                                Hoạt động
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                onClick={() => {
+                                                    document.querySelector(
+                                                        ".small-status-input"
+                                                    ).innerHTML = "Bị khóa";
+                                                }}
+                                            >
+                                                Bị khóa
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                             <div class="flex text-base sm:text-lg md:text-xl">
                                 <div class="flex-none small-facebook-title sm:text-lg md:text-xl">
@@ -1193,7 +1416,7 @@ function UserManage() {
                                 <input
                                     type="text"
                                     placeholder={currentProfile.dayOfBirth}
-                                    class="small-birth-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black"
+                                    class="small-birth-input input input-ghost sm:text-lg md:text-xl whitespace-nowrap p-0 h-6 placeholder-black w-full"
                                     onKeyUp={() => {
                                         inputFill(".small-birth-title", ".small-birth-input");
                                     }}
